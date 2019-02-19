@@ -46,12 +46,12 @@
 	],
 	"mocha": {
 		"tests": [
-			"packages/**/*.tests.js"
+			"app/**/*.tests.js"
 		],
 		"files": [
-			"packages/**/*.mocks.js",
-			"packages/**/*.js",
-			"!packages/**/*.tests.js"
+			"app/**/*.mocks.js",
+			"app/**/*.js",
+			"!app/**/*.tests.js"
 		]
 	},
 	"keywords": [
@@ -65,7 +65,7 @@
 		"debug-brk": "meteor run --inspect-brk",
 		"lint": "meteor npm run jslint && meteor npm run stylelint",
 		"jslint": "eslint .",
-		"stylelint": "stylelint \"packages/**/*.css\"",
+		"stylelint": "stylelint \"app/**/*.css\"",
 		"test": "node .scripts/start.js",
 		"chimp-watch": "chimp --ddp=http://localhost:3000 --watch --mocha --path=tests/end-to-end",
 		"chimp-test": "chimp tests/chimp-config.js",

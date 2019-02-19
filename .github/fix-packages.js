@@ -397,6 +397,43 @@ function fixEslintignore() {
 	fs.writeFileSync('.eslintignore', file);
 }
 
+function fixStylelintignore() {
+	let file = fs.readFileSync('.stylelintignore').toString();
+
+	file = file.replace('packages/rocketchat_theme/client/vendor/fontello/css/fontello.css', 'app/rocketchat_theme/client/vendor/fontello/css/fontello.css');
+
+	fs.writeFileSync('.stylelintignore', file);
+}
+
+function fixUnittests() {
+	const files = glob.sync('app/**/*.mocks.js');
+	files.forEach((filePath) => {
+		let file = fs.readFileSync(filePath).toString();
+
+		if (file.match(/mock\('meteor\/rocketchat:/g)) {
+			let count = 0;
+			file = file.replace(/mock\('(meteor\/(rocketchat:.+?))'/g, (str, p1, name) => {
+				console.log(str, p1, name);
+				if (packagesToMove[name]) {
+					count++;
+					return `mock('/app/${packagesToMove[name]}'`;
+				}
+				return str;
+			});
+
+			if (count > 0) {
+				// console.log(filePath);
+				fs.writeFileSync(filePath, file);
+			}
+		}
+	});
+
+	let file = fs.readFileSync('package.json').toString();
+
+	file = file.replace(/packages\/\*\*\//g, 'app/**/');
+
+	fs.writeFileSync('package.json', file);
+}
 
 movePackagesAndRemoveFromMeteorPackageFile();
 splitLivechatPackage();
@@ -408,6 +445,8 @@ convertImportsToNewPath();
 addMissingMeteorPackages();
 removeOldPackageJSFiles();
 fixEslintignore();
+fixStylelintignore();
+fixUnittests();
 removeCors(); // TODO: remove
 
 
