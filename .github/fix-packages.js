@@ -435,6 +435,14 @@ function fixUnittests() {
 	fs.writeFileSync('package.json', file);
 }
 
+function removeKatexInstall() {
+	let file = fs.readFileSync('package.json').toString();
+
+	file = file.replace(/\n\t+"postinstall":.+/, '');
+
+	fs.writeFileSync('package.json', file);
+}
+
 movePackagesAndRemoveFromMeteorPackageFile();
 splitLivechatPackage();
 moveAssetsToPublicFolder();
@@ -447,6 +455,7 @@ removeOldPackageJSFiles();
 fixEslintignore();
 fixStylelintignore();
 fixUnittests();
+removeKatexInstall();
 removeCors(); // TODO: remove
 
 
