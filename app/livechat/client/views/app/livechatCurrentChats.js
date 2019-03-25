@@ -2,9 +2,11 @@ import { Mongo } from 'meteor/mongo';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Template } from 'meteor/templating';
+
 import { AutoComplete } from 'meteor/mizzao:autocomplete';
 import { modal, call } from '/app/ui-utils';
 import { t } from '/app/utils';
+
 import _ from 'underscore';
 import moment from 'moment';
 import { Blaze } from 'meteor/blaze';
@@ -115,6 +117,16 @@ Template.livechatCurrentChats.events({
 				showConfirmButton: false,
 			});
 		});
+	},
+	'autocompleteselect input[id=agent]'(event, template, agent) {
+		template.selectedAgent.set(agent._id);
+	},
+
+	'input [id=agent]'(event, template) {
+		const input = event.currentTarget;
+		if (input.value === '') {
+			template.selectedAgent.set();
+		}
 	},
 });
 
