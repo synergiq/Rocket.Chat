@@ -231,14 +231,16 @@ export const RoomManager = new function() {
 			const scrollTop = $(dom).find('.messages-box > .wrapper').scrollTop() - 50;
 			const totalHeight = $(dom).find('.messages-box > .wrapper > ul').height() + 40;
 
-			return $('.messages-box .mention-link-me').each(function(index, item) {
-				const topOffset = $(item).offset().top + scrollTop;
+			Array.from(document.querySelectorAll('.messages-box .mention-link--me')).forEach((mentionLink) => {
+				const topOffset = $(mentionLink).offset().top + scrollTop;
 				const percent = (100 / totalHeight) * topOffset;
-				if ($(item).hasClass('mention-link-all')) {
-					return ticksBar.append(`<div class="tick background-attention-color" style="top: ${ percent }%;"></div>`);
-				} else {
-					return ticksBar.append(`<div class="tick background-primary-action-color" style="top: ${ percent }%;"></div>`);
-				}
+				ticksBar.append(`<div class="tick tick--me" style="top: ${ percent }%;"></div>`);
+			});
+
+			Array.from(document.querySelectorAll('.messages-box .mention-link--group')).forEach((mentionLink) => {
+				const topOffset = $(mentionLink).offset().top + scrollTop;
+				const percent = (100 / totalHeight) * topOffset;
+				ticksBar.append(`<div class="tick tick--group" style="top: ${ percent }%;"></div>`);
 			});
 		}
 	};
