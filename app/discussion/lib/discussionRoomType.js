@@ -4,7 +4,7 @@ import { RoomTypeConfig, roomTypes, getUserPreference } from '../../utils';
 export class DiscussionRoomType extends RoomTypeConfig {
 	constructor() {
 		super({
-			identifier: 't',
+			identifier: 'd',
 			order: 25,
 			label: 'Discussion',
 		});
