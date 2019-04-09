@@ -479,26 +479,22 @@ const getPreviousSentMessage = (currentNode) => {
 };
 
 const setNewDayAndGroup = (currentNode, previousNode, forceDate, period, noDate) => {
+	const { classList, dataset: currentDataset } = currentNode;
 
-
-	const { classList } = currentNode;
-
-	// const $nextNode = $(nextNode);
-	if (previousNode == null) {
-
+	if (!previousNode) {
 		classList.remove('sequential');
-		return !noDate && classList.add('new-day');
+		!noDate && classList.add('new-day');
+		return;
 	}
 
-	const previousDataset = previousNode.dataset;
-	const currentDataset = currentNode.dataset;
+	const { dataset: previousDataset } = previousNode;
 	const previousMessageDate = new Date(parseInt(previousDataset.timestamp));
 	const currentMessageDate = new Date(parseInt(currentDataset.timestamp));
 
 	if (!noDate && (forceDate || previousMessageDate.toDateString() !== currentMessageDate.toDateString())) {
+		classList.remove('sequential');
 		classList.add('new-day');
 	}
-
 
 	if (previousDataset.tmid !== currentDataset.tmid) {
 		return classList.remove('sequential');
@@ -511,7 +507,6 @@ const setNewDayAndGroup = (currentNode, previousNode, forceDate, period, noDate)
 	if ([previousDataset.groupable, currentDataset.groupable].includes('false')) {
 		return classList.remove('sequential');
 	}
-
 };
 
 Template.message.onViewRendered = function(context) {
@@ -556,7 +551,5 @@ Template.message.onViewRendered = function(context) {
 			}
 			templateInstance.sendToBottomIfNecessary();
 		}
-
 	});
-
 };
