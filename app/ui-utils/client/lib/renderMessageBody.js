@@ -26,9 +26,11 @@ const mem = (fn, tm = 500, generateKey = generateKeyDefault) => {
 };
 
 export const renderMessageBody = mem((message) => {
-	message.html = s.trim(message.msg) ? s.escapeHTML(message.msg) : '';
+	message.html = s.escapeHTML(message.html) || s.trim(message.msg) || '';
 
 	const { tokens, html } = callbacks.run('renderMessage', message);
+
+	message.html = s.escapeHTML(message.html);
 
 	return (Array.isArray(tokens) ? tokens.reverse() : [])
 		.reduce((html, { token, text }) => html.replace(token, () => text), html);
