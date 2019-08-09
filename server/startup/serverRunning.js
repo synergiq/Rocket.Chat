@@ -1,32 +1,17 @@
-import { Meteor } from 'meteor/meteor';
-import { MongoInternals } from 'meteor/mongo';
-import { SystemLogger } from '../../app/logger';
-import { settings } from '../../app/settings';
-import { Info } from '../../app/utils';
 import fs from 'fs';
 import path from 'path';
+
 import semver from 'semver';
+import { Meteor } from 'meteor/meteor';
+import { TAPi18n } from 'meteor/rocketchat:tap-i18n';
+
+import { SystemLogger } from '../../app/logger';
+import { settings } from '../../app/settings';
+import { Info, getMongoInfo } from '../../app/utils';
+import { Roles, Users } from '../../app/models/server';
 
 Meteor.startup(function() {
-	let oplogState = 'Disabled';
-
-	const { mongo } = MongoInternals.defaultRemoteCollectionDriver();
-
-	if (mongo._oplogHandle && mongo._oplogHandle.onOplogEntry) {
-		oplogState = 'Enabled';
-		if (settings.get('Force_Disable_OpLog_For_Cache') === true) {
-			oplogState += ' (Disabled for Cache Sync)';
-		}
-	}
-
-	let mongoDbVersion;
-	try {
-		const { version } = Promise.await(mongo.db.command({ buildInfo: 1 }));
-		mongoDbVersion = version;
-	} catch (e) {
-		mongoDbVersion = 'Error getting version';
-		console.error('Error getting MongoDB version');
-	}
+	const { oplogEnabled, mongoVersion, mongoStorageEngine } = getMongoInfo();
 
 	const desiredNodeVersion = semver.clean(fs.readFileSync(path.join(process.cwd(), '../../.node_version.txt')).toString());
 	const desiredNodeVersionMajor = String(semver.parse(desiredNodeVersion).major);
@@ -35,11 +20,12 @@ Meteor.startup(function() {
 		let msg = [
 			`Rocket.Chat Version: ${ Info.version }`,
 			`     NodeJS Version: ${ process.versions.node } - ${ process.arch }`,
-			`    MongoDB Version: ${ mongoDbVersion }`,
+			`    MongoDB Version: ${ mongoVersion }`,
+			`     MongoDB Engine: ${ mongoStorageEngine }`,
 			`           Platform: ${ process.platform }`,
 			`       Process Port: ${ process.env.PORT }`,
 			`           Site URL: ${ settings.get('Site_Url') }`,
-			`   ReplicaSet OpLog: ${ oplogState }`,
+			`   ReplicaSet OpLog: ${ oplogEnabled ? 'Enabled' : 'Disabled' }`,
 		];
 
 		if (Info.commit && Info.commit.hash) {
@@ -52,20 +38,65 @@ Meteor.startup(function() {
 
 		msg = msg.join('\n');
 
+		if (!oplogEnabled) {
+			msg += ['', '', 'OPLOG / REPLICASET IS REQUIRED TO RUN ROCKET.CHAT, MORE INFORMATION AT:', 'https://go.rocket.chat/i/oplog-required'].join('\n');
+			SystemLogger.error_box(msg, 'SERVER ERROR');
+
+			return process.exit(1);
+		}
+
 		if (!semver.satisfies(process.versions.node, desiredNodeVersionMajor)) {
 			msg += ['', '', 'YOUR CURRENT NODEJS VERSION IS NOT SUPPORTED,', `PLEASE UPGRADE / DOWNGRADE TO VERSION ${ desiredNodeVersionMajor }.X.X`].join('\n');
 			SystemLogger.error_box(msg, 'SERVER ERROR');
 
-			return process.exit();
+			return process.exit(1);
 		}
 
-		if (!semver.satisfies(mongoDbVersion, '>=3.2.0')) {
+		if (!semver.satisfies(semver.coerce(mongoVersion), '>=3.2.0')) {
 			msg += ['', '', 'YOUR CURRENT MONGODB VERSION IS NOT SUPPORTED,', 'PLEASE UPGRADE TO VERSION 3.2 OR LATER'].join('\n');
 			SystemLogger.error_box(msg, 'SERVER ERROR');
 
-			return process.exit();
+			return process.exit(1);
 		}
 
-		return SystemLogger.startup_box(msg, 'SERVER RUNNING');
+		SystemLogger.startup_box(msg, 'SERVER RUNNING');
+
+		// Deprecation
+		if (!semver.satisfies(semver.coerce(mongoVersion), '>=3.4.0')) {
+			msg = [`YOUR CURRENT MONGODB VERSION (${ mongoVersion }) IS DEPRECATED.`, 'IT WILL NOT BE SUPPORTED ON ROCKET.CHAT VERSION 2.0.0 AND GREATER,', 'PLEASE UPGRADE MONGODB TO VERSION 3.4 OR GREATER'].join('\n');
+			SystemLogger.deprecation_box(msg, 'DEPRECATION');
+
+			const id = `mongodbDeprecation_${ mongoVersion.replace(/[^0-9]/g, '_') }`;
+			const title = 'MongoDB_Deprecated';
+			const text = 'MongoDB_version_s_is_deprecated_please_upgrade_your_installation';
+			const link = 'https://rocket.chat/docs/installation';
+
+			Roles.findUsersInRole('admin').forEach((adminUser) => {
+				if (Users.bannerExistsById(id)) {
+					return;
+				}
+
+				try {
+					Meteor.runAsUser(adminUser._id, () => Meteor.call('createDirectMessage', 'rocket.cat'));
+
+					Meteor.runAsUser('rocket.cat', () => Meteor.call('sendMessage', {
+						msg: `*${ TAPi18n.__(title, adminUser.language) }*\n${ TAPi18n.__(text, mongoVersion, adminUser.language) }\n${ link }`,
+						rid: [adminUser._id, 'rocket.cat'].sort().join(''),
+					}));
+				} catch (e) {
+					console.error(e);
+				}
+
+				Users.addBannerById(adminUser._id, {
+					id,
+					priority: 100,
+					title,
+					text,
+					textArguments: [mongoVersion],
+					modifiers: ['danger'],
+					link,
+				});
+			});
+		}
 	}, 100);
 });

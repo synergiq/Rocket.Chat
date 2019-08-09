@@ -1,3 +1,5 @@
+import { Meteor } from 'meteor/meteor';
+
 import { Base } from './_Base';
 
 const normalizePeers = (basePeers, options) => {
@@ -18,6 +20,10 @@ const normalizePeers = (basePeers, options) => {
 class FederationEventsModel extends Base {
 	constructor() {
 		super('federation_events');
+
+		this.tryEnsureIndex({ t: 1 });
+		this.tryEnsureIndex({ fulfilled: 1 });
+		this.tryEnsureIndex({ ts: 1 });
 	}
 
 	// Sometimes events errored but the error is final
@@ -38,32 +44,40 @@ class FederationEventsModel extends Base {
 		});
 	}
 
-	createEvent(type, payload, peer) {
+	createEvent(type, payload, peer, options) {
 		const record = {
 			t: type,
 			ts: new Date(),
 			fulfilled: false,
 			payload,
 			peer,
+			options,
 		};
 
 		record._id = this.insert(record);
 
-		this.emit('createEvent', record);
+		Meteor.defer(() => {
+			this.emit('createEvent', record);
+		});
 
 		return record;
 	}
 
-	createEventForPeers(type, payload, peers) {
+	createEventForPeers(type, payload, peers, options = {}) {
 		const records = [];
 
 		for (const peer of peers) {
-			const record = this.createEvent(type, payload, peer);
+			const record = this.createEvent(type, payload, peer, options);
 
 			records.push(record);
 		}
 
 		return records;
+	}
+
+	// Create a `ping(png)` event
+	ping(peers) {
+		return this.createEventForPeers('png', {}, peers, { retry: { total: 1 } });
 	}
 
 	// Create a `directRoomCreated(drc)` event
@@ -246,10 +260,12 @@ class FederationEventsModel extends Base {
 
 	// Get all unfulfilled events
 	getUnfulfilled() {
-		return this.find({ fulfilled: false }, { sort: { ts: 1 } }).fetch();
+		return this.find({ fulfilled: false }, { sort: { ts: 1 } });
 	}
 
-
+	findByType(t) {
+		return this.find({ t });
+	}
 }
 
 export const FederationEvents = new FederationEventsModel();

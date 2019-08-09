@@ -15,6 +15,7 @@ import Statistics from './models/Statistics';
 import Permissions from './models/Permissions';
 import Roles from './models/Roles';
 import CustomSounds from './models/CustomSounds';
+import CustomUserStatus from './models/CustomUserStatus';
 import Integrations from './models/Integrations';
 import IntegrationHistory from './models/IntegrationHistory';
 import CredentialTokens from './models/CredentialTokens';
@@ -38,6 +39,7 @@ export { AppsModel } from './models/apps-model';
 export { FederationDNSCache } from './models/FederationDNSCache';
 export { FederationEvents } from './models/FederationEvents';
 export { FederationKeys } from './models/FederationKeys';
+export { FederationPeers } from './models/FederationPeers';
 
 export {
 	Base,
@@ -57,6 +59,7 @@ export {
 	Permissions,
 	Roles,
 	CustomSounds,
+	CustomUserStatus,
 	Integrations,
 	IntegrationHistory,
 	CredentialTokens,

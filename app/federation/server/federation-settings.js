@@ -1,10 +1,13 @@
 import { Meteor } from 'meteor/meteor';
+
 import { settings } from '../../settings';
 import { FederationKeys } from '../../models';
 
 Meteor.startup(function() {
 	// const federationUniqueId = FederationKeys.getUniqueId();
 	const federationPublicKey = FederationKeys.getPublicKeyString();
+
+	const defaultHubURL = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'https://hub.rocket.chat';
 
 	settings.addGroup('Federation', function() {
 		this.add('FEDERATION_Enabled', false, {
@@ -33,6 +36,7 @@ Meteor.startup(function() {
 			i18nLabel: 'FEDERATION_Domain',
 			i18nDescription: 'FEDERATION_Domain_Description',
 			alert: 'FEDERATION_Domain_Alert',
+			disableReset: true,
 		});
 
 		this.add('FEDERATION_Public_Key', federationPublicKey, {
@@ -43,7 +47,7 @@ Meteor.startup(function() {
 			i18nDescription: 'FEDERATION_Public_Key_Description',
 		});
 
-		this.add('FEDERATION_Hub_URL', 'https://hub.rocket.chat', {
+		this.add('FEDERATION_Hub_URL', defaultHubURL, {
 			group: 'Federation Hub',
 			type: 'string',
 			i18nLabel: 'FEDERATION_Hub_URL',
@@ -64,5 +68,9 @@ Meteor.startup(function() {
 			public: true,
 		});
 
+		this.add('FEDERATION_Test_Setup', 'FEDERATION_Test_Setup', {
+			type: 'action',
+			actionText: 'FEDERATION_Test_Setup',
+		});
 	});
 });
