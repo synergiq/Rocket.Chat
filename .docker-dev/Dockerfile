@@ -12,6 +12,7 @@ ARG APP_USER_DIR=/home/${APP_USER}
 # run environment
 ENV APP_PORT=3000
 ENV APP_ROOT=/app
+ENV METEOR_ALLOW_SUPERUSER=true
 
 # exposed ports and volumes
 EXPOSE $APP_PORT
@@ -28,13 +29,17 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get clean
 # RUN localedef ${APP_LOCALE}.${APP_CHARSET} -i ${APP_LOCALE} -f ${APP_CHARSET}
 
 # create a non-root user that can write to /usr/local (required by Meteor)
-RUN useradd -mUd ${APP_USER_DIR} ${APP_USER}
-RUN chown -Rh ${APP_USER} /usr/local
-USER ${APP_USER}
+# RUN useradd -mUd ${APP_USER_DIR} ${APP_USER}
+# RUN chown -Rh ${APP_USER} /usr/local
+# USER ${APP_USER}
 
 # install Meteor
 RUN curl https://install.meteor.com/ | sh
 
 # run Meteor from the app directory
 WORKDIR ${APP_ROOT}
-ENTRYPOINT [ "/usr/local/bin/meteor", "--port=3000" ]
+# ENTRYPOINT [ "/usr/local/bin/meteor", "--port=3000" ]
+
+RUN echo "meteor npm install" >> /etc/bash.bashrc
+RUN echo "meteor --port=3000" >> /etc/bash.bashrc
+ENTRYPOINT ["/bin/bash"]
