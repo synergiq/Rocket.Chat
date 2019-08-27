@@ -5,11 +5,16 @@ import { Users } from '../../../models/server';
 import { getNameAndDomain, isFullyQualified } from './helpers/federatedResources';
 
 const denormalizeUser = (originalResource) => {
+	if (!originalResource.federation) { return originalResource; }
+
 	const resource = { ...originalResource };
 
-	resource.emails = [{
-		address: resource.federation.originalInfo.email,
-	}];
+	// Only denormalize local emails
+	if (resource.federation.origin === Federation.domain) {
+		resource.emails = [{
+			address: resource.federation.originalInfo.email,
+		}];
+	}
 
 	const [username, domain] = getNameAndDomain(resource.username);
 
