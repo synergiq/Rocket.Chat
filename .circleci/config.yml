@@ -140,8 +140,12 @@ jobs:
             # to do this we can clear the main files and it build the rest
             echo "" > server/main.js
             echo "" > client/main.js
-            meteor build --server-only --directory /tmp/build-test
+            git status
+            git --no-pager diff
+            meteor build --server-only --debug --directory /tmp/build-test
             git checkout -- server/main.js client/main.js
+            git status
+            git --no-pager diff
 
       - run:
           name: Build Rocket.Chat
