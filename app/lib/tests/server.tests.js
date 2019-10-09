@@ -41,7 +41,6 @@ describe('PasswordPolicyClass', () => {
 				const passwordPolice = new PasswordPolicyClass();
 				assert.equal(passwordPolice.validate('a'), true);
 				assert.equal(passwordPolice.validate('aaaaaaaaa'), true);
-				assert.equal(passwordPolice.validate('            '), true);
 			});
 		});
 	});
@@ -70,7 +69,6 @@ describe('PasswordPolicyClass', () => {
 			assert.equal(passwordPolice.validate('1'), false);
 			assert.equal(passwordPolice.validate('1234'), false);
 			assert.equal(passwordPolice.validate('12345'), true);
-			assert.equal(passwordPolice.validate('     '), true);
 		});
 
 		it('should restrict by maxLength', () => {
@@ -83,7 +81,6 @@ describe('PasswordPolicyClass', () => {
 			assert.equal(passwordPolice.validate('1'), true);
 			assert.equal(passwordPolice.validate('12345'), true);
 			assert.equal(passwordPolice.validate('123456'), false);
-			assert.equal(passwordPolice.validate('      '), false);
 		});
 
 		it('should allow repeated characters', () => {
@@ -96,7 +93,6 @@ describe('PasswordPolicyClass', () => {
 			assert.equal(passwordPolice.validate('1'), true);
 			assert.equal(passwordPolice.validate('12345'), true);
 			assert.equal(passwordPolice.validate('123456'), true);
-			assert.equal(passwordPolice.validate('      '), true);
 			assert.equal(passwordPolice.validate('11111111111111'), true);
 		});
 
@@ -112,7 +108,6 @@ describe('PasswordPolicyClass', () => {
 			assert.equal(passwordPolice.validate('11'), true);
 			assert.equal(passwordPolice.validate('111'), true);
 			assert.equal(passwordPolice.validate('1111'), false);
-			assert.equal(passwordPolice.validate('     '), false);
 			assert.equal(passwordPolice.validate('123456'), true);
 		});
 
@@ -130,7 +125,6 @@ describe('PasswordPolicyClass', () => {
 			assert.equal(passwordPolice.validate('1111'), true);
 			assert.equal(passwordPolice.validate('11111'), true);
 			assert.equal(passwordPolice.validate('111111'), false);
-			assert.equal(passwordPolice.validate('      '), false);
 			assert.equal(passwordPolice.validate('123456'), true);
 		});
 
@@ -144,7 +138,6 @@ describe('PasswordPolicyClass', () => {
 			assert.equal(passwordPolice.validate('a'), true);
 			assert.equal(passwordPolice.validate('aa'), true);
 			assert.equal(passwordPolice.validate('A'), false);
-			assert.equal(passwordPolice.validate('   '), false);
 			assert.equal(passwordPolice.validate('123456'), false);
 			assert.equal(passwordPolice.validate('AAAAA'), false);
 			assert.equal(passwordPolice.validate('AAAaAAA'), true);
@@ -160,7 +153,6 @@ describe('PasswordPolicyClass', () => {
 			assert.equal(passwordPolice.validate('a'), false);
 			assert.equal(passwordPolice.validate('aa'), false);
 			assert.equal(passwordPolice.validate('A'), true);
-			assert.equal(passwordPolice.validate('   '), false);
 			assert.equal(passwordPolice.validate('123456'), false);
 			assert.equal(passwordPolice.validate('AAAAA'), true);
 			assert.equal(passwordPolice.validate('AAAaAAA'), true);
@@ -176,7 +168,6 @@ describe('PasswordPolicyClass', () => {
 			assert.equal(passwordPolice.validate('a'), false);
 			assert.equal(passwordPolice.validate('aa'), false);
 			assert.equal(passwordPolice.validate('A'), false);
-			assert.equal(passwordPolice.validate('   '), false);
 			assert.equal(passwordPolice.validate('123456'), true);
 			assert.equal(passwordPolice.validate('AAAAA'), false);
 			assert.equal(passwordPolice.validate('AAAaAAA'), false);
@@ -193,7 +184,6 @@ describe('PasswordPolicyClass', () => {
 			assert.equal(passwordPolice.validate('a'), false);
 			assert.equal(passwordPolice.validate('aa'), false);
 			assert.equal(passwordPolice.validate('A'), false);
-			assert.equal(passwordPolice.validate('   '), false);
 			assert.equal(passwordPolice.validate('123456'), false);
 			assert.equal(passwordPolice.validate('AAAAA'), false);
 			assert.equal(passwordPolice.validate('AAAaAAA'), false);
