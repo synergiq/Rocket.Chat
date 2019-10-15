@@ -70,7 +70,7 @@ async function all(uid, permissions = [], scope) {
 	const sortedUsers = userRoles.sort((a, b) => a.localeCompare(b));
 
 	const roles = (await Promise.all(sortedUsers.map(getRole))).reduce((roles, role) => {
-		roles[role.scope || 'Users'] = [].concat([role._id]);
+		roles[role.scope || 'Users'] = roles[role.scope || 'Users'] ? roles[role.scope || 'Users'].concat([role._id]) : [].concat([role._id]);
 		return roles;
 	}, {});
 
