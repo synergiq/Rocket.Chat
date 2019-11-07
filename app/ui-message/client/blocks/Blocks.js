@@ -2,6 +2,7 @@ import { Template } from 'meteor/templating';
 
 import { APIClient } from '../../../utils';
 import { modal } from '../../../ui-utils';
+
 import './Blocks.html';
 
 Template.Blocks.events({
@@ -21,6 +22,7 @@ Template.Blocks.events({
 Template.Blocks.helpers({
 	template() {
 		const { type } = this;
+
 		switch (type) {
 			case 'section':
 				return 'SectionBlock';
@@ -30,6 +32,12 @@ Template.Blocks.helpers({
 				return 'ImageBlock';
 			case 'actions':
 				return 'ActionsBlock';
+			case 'context':
+				// TODO
+				break;
+			case 'input':
+				// TODO
+				break;
 		}
 	},
 	data() {
