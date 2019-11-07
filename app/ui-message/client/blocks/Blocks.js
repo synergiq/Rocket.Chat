@@ -1,7 +1,7 @@
 import { Template } from 'meteor/templating';
 
 import { APIClient } from '../../../utils';
-import { modal } from '../../../ui-utils';
+import { modal } from '../../../ui-utils/client/lib/modal';
 
 import './Blocks.html';
 
@@ -11,7 +11,7 @@ Template.Blocks.events({
 		const { type, ...data } = await APIClient.post('apps/blockit/meu_app/outra_action', { actionId, appID, value, mid });
 
 		if (type === 'modal') {
-			modal.open({
+			modal.push({
 				template: 'ModalBlock',
 				data,
 			});
