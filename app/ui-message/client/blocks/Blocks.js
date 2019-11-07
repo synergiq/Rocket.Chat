@@ -1,18 +1,26 @@
 import { Template } from 'meteor/templating';
 
 import { APIClient } from '../../../utils';
+import { modal } from '../../../ui-utils';
 import './Blocks.html';
 
 Template.Blocks.events({
 	async 'click button'() {
-		console.log(await APIClient.post('api/apps/blockit/meu_app/outra_action'));
+		const { actionId, appID, value, mid } = this;
+		const { type, ...data } = await APIClient.post('apps/blockit/meu_app/outra_action', { actionId, appID, value, mid });
+
+		if (type === 'modal') {
+			modal.open({
+				template: 'ModalBlock',
+				data,
+			});
+		}
 	},
 });
 
 Template.Blocks.helpers({
 	template() {
 		const { type } = this;
-		console.log(type);
 		switch (type) {
 			case 'section':
 				return 'SectionBlock';
