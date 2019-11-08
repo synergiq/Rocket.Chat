@@ -16,7 +16,8 @@ export class AppBlockitBridge {
 		this.appActions = new Map();
 
 		this.appActions.set('meu_app', {
-			outra_action: () => ({
+			outra_action: (req) => ({
+				triggerId: req.body.triggerId,
 				success: true,
 				type: 'modal', // modal, home
 				title: {
@@ -47,8 +48,8 @@ export class AppBlockitBridge {
 							text: 'Example Image',
 							emoji: true,
 						},
-						image_url: 'https://api.slack.com/img/blocks/bkb_template_images/goldengate.png',
-						alt_text: 'Example Image',
+						imageUrl: 'https://api.slack.com/img/blocks/bkb_template_images/goldengate.png',
+						altText: 'Example Image',
 					},
 					{
 						type: 'actions',
@@ -57,7 +58,7 @@ export class AppBlockitBridge {
 								type: 'button',
 								text: {
 									type: 'plain_text',
-									text: 'Button',
+									text: 'OK',
 									emoji: true,
 								},
 							},
