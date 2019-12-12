@@ -88,12 +88,16 @@ jobs:
       run: |
         meteor npm install
 
+    - name: check package-lock
+      run: |
+        node .scripts/lock-verify.js
+
+    - run: npm run lint
+
     - name: Launch MongoDB
       uses: wbari/start-mongoDB@v0.2
       with:
         mongoDBVersion: "4.0"
-
-    - run: npm run lint
 
     - run: npm run testunit
 
