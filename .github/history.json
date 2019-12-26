@@ -38023,6 +38023,12 @@
           ]
         }
       ]
+    },
+    "2.4.0": {
+      "node_version": "8.17.0",
+      "npm_version": "6.13.4",
+      "mongo_versions": [],
+      "pull_requests": []
     }
   }
 }

@@ -1,8 +1,11 @@
 
-# 2.4.0 (Under Release Candidate Process)
+# 2.4.0
+`2019-12-26  ·  4 🎉  ·  28 🚀  ·  20 🐛  ·  17 🔍  ·  21 👩‍💻👨‍💻`
 
-## 2.4.0-rc.0
-`2019-12-22  ·  4 🎉  ·  28 🚀  ·  20 🐛  ·  17 🔍  ·  21 👩‍💻👨‍💻`
+### Engine versions
+- Node: `8.17.0`
+- NPM: `6.13.4`
+- MongoDB: ``
 
 ### 🎉 New features
 
