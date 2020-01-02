@@ -69,7 +69,7 @@ GroupPage.Skeleton = function GroupPageSkeleton() {
 	const t = useTranslation();
 
 	return <div className='page-container'>
-		<Header rawSectionName={<Headline style={{ width: '20rem' }}><Skeleton /></Headline>}>
+		<Header rawSectionName={<Skeleton style={{ width: '20rem'}}/>}>
 			<Header.ButtonSection>
 				<Button
 					children={t('Save_changes')}
@@ -81,7 +81,7 @@ GroupPage.Skeleton = function GroupPageSkeleton() {
 
 		<div className='content'>
 			<Wrapper>
-				<Paragraph.Skeleton animated />
+				<Paragraph.Skeleton />
 
 				<Accordion className='page-settings'>
 					<Section.Skeleton />
