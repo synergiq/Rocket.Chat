@@ -29,9 +29,9 @@ import {
 import { ImporterWebsocketReceiver } from '../ImporterWebsocketReceiver';
 import { showImporterException } from '../functions/showImporterException';
 import { useRoute } from '../../../../client/contexts/RouterContext';
+import { useDebouncedValue } from '../../../../client/hooks/useDebouncedValue';
 import { useSafely } from '../../../../client/hooks/useSafely';
 import { useEndpoint } from '../../../../client/contexts/ServerContext';
-import { useDebounce } from '../../../ui/client/views/app/components/hooks';
 
 const waitFor = (fn, predicate) => new Promise((resolve, reject) => {
 	const callPromise = () => {
@@ -307,7 +307,7 @@ function PrepareImportPage() {
 	const [tab, setTab] = useState('users');
 	const handleTabClick = useMemo(() => (tab) => () => setTab(tab), []);
 
-	const statusDebounced = useDebounce(status, 100);
+	const statusDebounced = useDebouncedValue(status, 100);
 	return <Page>
 		<Page.Header title={t('Importing_Data')}>
 			<ButtonGroup>

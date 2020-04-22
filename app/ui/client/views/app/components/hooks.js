@@ -5,19 +5,6 @@ import s from 'underscore.string';
 import { useUserPreference } from '../../../../../../client/contexts/UserContext';
 import { useSetting } from '../../../../../../client/contexts/SettingsContext';
 
-export function useDebounce(value, delay) {
-	const [debouncedValue, setDebouncedValue] = useState(value);
-
-	useEffect(() => {
-		const handler = setTimeout(() => {
-			setDebouncedValue(value);
-		}, delay);
-		return () => clearTimeout(handler);
-	}, [value]);
-
-	return debouncedValue;
-}
-
 export function useMediaQuery(query) {
 	const [matches, setQuery] = useState(window.matchMedia(query).matches);
 
