@@ -1,45 +1,46 @@
 import React, { useState, useCallback } from 'react';
-import { Box, Button, Icon, TextInput, Margins } from '@rocket.chat/fuselage';
+import { Box, Button, Icon, TextInput, Margins, Avatar } from '@rocket.chat/fuselage';
 
 import { useTranslation } from '../../../contexts/TranslationContext';
 import { useFileInput } from '../../../hooks/useFileInput';
-import UserAvatar from './UserAvatar';
+import { useAvatarUrlFromUserId } from '../../../hooks/useAvatarUrlFromUserId';
 
-function UserAvatarSuggestions({ suggestions, setAvatarObj, setNewAvatarSource, disabled, ...props }) {
+function UserAvatarSuggestions({ suggestions, onChangeAvatarObj, setNewAvatarSource, disabled, ...props }) {
 	const handleClick = useCallback((suggestion) => () => {
-		setAvatarObj(suggestion);
+		onChangeAvatarObj(suggestion);
 		setNewAvatarSource(suggestion.blob);
-	}, [setAvatarObj, setNewAvatarSource]);
+	}, [onChangeAvatarObj, setNewAvatarSource]);
 
 	return <Margins inline='x4' {...props}>
 		{Object.values(suggestions).map((suggestion) => <Button key={suggestion.service} disabled={disabled} square onClick={handleClick(suggestion)}>
-			<UserAvatar title={suggestion.service} size='x36' url={suggestion.blob} mie='x4'/>
+			<Avatar title={suggestion.service} size='x36' url={suggestion.blob} mie='x4'/>
 		</Button>)}
 	</Margins>;
 }
 
-export function UserAvatarEditor({ username, setAvatarObj, suggestions, disabled, userId }) {
+export function UserAvatarEditor({ username, onChangeAvatarObj, suggestions, disabled, userId }) {
 	const t = useTranslation();
 	const [avatarFromUrl, setAvatarFromUrl] = useState('');
 	const [newAvatarSource, setNewAvatarSource] = useState();
 
 	const setUploadedPreview = useCallback(async (file, avatarObj) => {
-		setAvatarObj(avatarObj);
+		onChangeAvatarObj(avatarObj);
 		setNewAvatarSource(URL.createObjectURL(file));
-	}, [setAvatarObj]);
+	}, [onChangeAvatarObj]);
 
 	const clickUpload = useFileInput(setUploadedPreview);
 
 	const clickUrl = () => {
 		setNewAvatarSource(avatarFromUrl);
-		setAvatarObj({ avatarUrl: avatarFromUrl });
+		onChangeAvatarObj({ avatarUrl: avatarFromUrl });
 	};
 	const clickReset = () => {
 		setNewAvatarSource(`/avatar/%40${ username }`);
-		setAvatarObj('reset');
+		onChangeAvatarObj('reset');
 	};
 
-	const url = newAvatarSource || undefined;
+	const [, originalAvatarUrl] = useAvatarUrlFromUserId(userId);
+	const url = newAvatarSource || originalAvatarUrl;
 
 	const handleAvatarFromUrlChange = (event) => {
 		setAvatarFromUrl(event.currentTarget.value);
@@ -48,14 +49,14 @@ export function UserAvatarEditor({ username, setAvatarObj, suggestions, disabled
 	return <Box display='flex' flexDirection='column' fontScale='p2'>
 		{t('Profile_picture')}
 		<Box display='flex' flexDirection='row' mbs='x4'>
-			<UserAvatar size='x120' url={url} userId={userId} username={username} style={{ objectFit: 'contain' }} mie='x4'/>
+			<Avatar size='x120' url={url} style={{ objectFit: 'contain' }} mie='x4'/>
 			<Box display='flex' flexDirection='column' flexGrow='1' justifyContent='space-between' mis='x4'>
 				<Box display='flex' flexDirection='row' mbs='none'>
 					<Margins inline='x4'>
-						<Button square mis='none' onClick={clickReset} disabled={disabled}><UserAvatar size='x36' url={`/avatar/%40${ username }`} mie='x4'/></Button>
+						<Button square mis='none' onClick={clickReset} disabled={disabled}><Avatar size='x36' url={`/avatar/%40${ username }`} mie='x4'/></Button>
 						<Button square onClick={clickUpload} disabled={disabled}><Icon name='upload' size='x20'/></Button>
 						<Button square mie='none' onClick={clickUrl} disabled={disabled}><Icon name='permalink' size='x20'/></Button>
-						{suggestions && <UserAvatarSuggestions suggestions={suggestions} setAvatarObj={setAvatarObj} setNewAvatarSource={setNewAvatarSource} disabled={disabled}/>}
+						{suggestions && <UserAvatarSuggestions suggestions={suggestions} onChangeAvatarObj={onChangeAvatarObj} setNewAvatarSource={setNewAvatarSource} disabled={disabled}/>}
 					</Margins>
 				</Box>
 				<Box>{t('Use_url_for_avatar')}</Box>

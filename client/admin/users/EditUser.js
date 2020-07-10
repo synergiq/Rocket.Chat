@@ -4,11 +4,11 @@ import { Box, Field, Margins, Button } from '@rocket.chat/fuselage';
 import { useTranslation } from '../../contexts/TranslationContext';
 import { useEndpointDataExperimental, ENDPOINT_STATES } from '../../hooks/useEndpointDataExperimental';
 import { useEndpointAction } from '../../hooks/useEndpointAction';
-import { useEndpointUpload } from '../../hooks/useEndpointUpload';
 import { useRoute } from '../../contexts/RouterContext';
 import UserAvatarEditor from '../../components/basic/avatar/UserAvatarEditor';
 import { useForm } from '../../hooks/useForm';
 import UserForm from './UserForm';
+import { useUpdateAvatar } from '../../hooks/useUpdateAvatar';
 import { FormSkeleton } from './Skeleton';
 
 export function EditUserWithData({ uid, ...props }) {
@@ -51,6 +51,8 @@ export function EditUser({ data, roles, ...props }) {
 
 	const router = useRoute('admin-users');
 
+	const updateAvatar = useUpdateAvatar(avatarObj, data._id);
+
 	const goToUser = useCallback((id) => router.push({
 		context: 'info',
 		id,
@@ -62,31 +64,7 @@ export function EditUser({ data, roles, ...props }) {
 		// TODO: remove JSON.stringify. Is used to keep useEndpointAction from rerendering the page indefinitely.
 	}), [data._id, JSON.stringify(values)]);
 
-	const saveAvatarQuery = useMemo(() => ({
-		userId: data._id,
-		avatarUrl: avatarObj && avatarObj.avatarUrl,
-		// TODO: remove JSON.stringify. Is used to keep useEndpointAction from rerendering the page indefinitely.
-	}), [data._id, JSON.stringify(avatarObj)]);
-
-	const resetAvatarQuery = useMemo(() => ({
-		userId: data._id,
-	}), [data._id]);
-
 	const saveAction = useEndpointAction('POST', 'users.update', saveQuery, t('User_updated_successfully'));
-	const saveAvatarAction = useEndpointUpload('users.setAvatar', saveAvatarQuery, t('Avatar_changed_successfully'));
-	const saveAvatarUrlAction = useEndpointAction('POST', 'users.setAvatar', saveAvatarQuery, t('Avatar_changed_successfully'));
-	const resetAvatarAction = useEndpointAction('POST', 'users.resetAvatar', resetAvatarQuery, t('Avatar_changed_successfully'));
-
-	const updateAvatar = useCallback(async () => {
-		if (avatarObj === 'reset') {
-			return resetAvatarAction();
-		}
-		if (avatarObj.avatarUrl) {
-			return saveAvatarUrlAction();
-		}
-		avatarObj.set('userId', data._id);
-		return saveAvatarAction(avatarObj);
-	}, [avatarObj, resetAvatarAction, saveAvatarAction, saveAvatarUrlAction, data._id]);
 
 	const handleSave = useCallback(async () => {
 		const result = await saveAction();
@@ -102,7 +80,7 @@ export function EditUser({ data, roles, ...props }) {
 
 	const canSaveOrReset = hasUnsavedChanges || avatarObj;
 
-	const prepend = useMemo(() => <UserAvatarEditor userId={data._id} username={data.username} setAvatarObj={setAvatarObj}/>, [data._id, data.username]);
+	const prepend = useMemo(() => <UserAvatarEditor userId={data._id} username={data.username} onChangeAvatarObj={setAvatarObj}/>, [data._id, data.username]);
 
 	const append = useMemo(() => <Field>
 		<Field.Row>
